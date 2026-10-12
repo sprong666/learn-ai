@@ -1,0 +1,9 @@
+{
+  "label": "SKILL 系列",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "逐步积累的优秀 SKILL 实战记录",
+    "slug": "skills"
+  }
+}
