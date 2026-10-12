@@ -4,3 +4,4 @@ build/
 .cache/
 npm-debug.log*
 .yarn/
+docusaurus-start.log

@@ -1,0 +1,340 @@
+.page {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* ===== atmosphere ===== */
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mesh {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.35;
+}
+
+.meshA {
+  width: 560px;
+  height: 560px;
+  top: -180px;
+  right: -120px;
+  background: radial-gradient(circle, rgba(31, 92, 71, 0.55), transparent 70%);
+}
+
+.meshB {
+  width: 480px;
+  height: 480px;
+  bottom: -160px;
+  left: -140px;
+  background: radial-gradient(circle, rgba(217, 123, 41, 0.4), transparent 70%);
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* ===== orchestrated entrance ===== */
+.fadeUp {
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== hero ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  padding: 5.5rem 2rem 4rem;
+}
+
+.heroInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.heroText {
+  flex: 1.4;
+}
+
+.badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--la-accent);
+  border-radius: 999px;
+  color: var(--la-accent);
+  margin-bottom: 1.25rem;
+}
+
+.heroTitle {
+  font-family: var(--ifm-heading-font-family);
+  font-size: 3.6rem;
+  font-weight: 900;
+  line-height: 1.15;
+  margin: 0 0 1.25rem;
+}
+
+/* unforgettable element: amber highlighter mark */
+.mark {
+  font-style: normal;
+  background-image: linear-gradient(transparent 62%, rgba(217, 123, 41, 0.35) 62%);
+  padding: 0 0.1em;
+}
+
+.heroSub {
+  font-size: 1.15rem;
+  color: var(--la-ink-soft);
+  max-width: 34em;
+  margin-bottom: 2rem;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cta {
+  padding: 0.7rem 1.8rem;
+}
+
+.ctaGhost {
+  background: transparent;
+  border: none;
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+.ctaGhost:hover {
+  color: var(--la-accent);
+}
+
+/* hero aside card */
+.heroAside {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.heroAsideCard {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 14px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 20px 40px rgba(20, 35, 29, 0.08);
+  transform: rotate(2deg);
+  min-width: 240px;
+}
+
+.heroAsideNo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.6rem;
+  font-weight: 600;
+  color: var(--la-accent);
+  display: block;
+  line-height: 1;
+}
+
+.heroAsideLabel {
+  font-weight: 700;
+  display: block;
+  margin: 0.25rem 0 0.9rem;
+}
+
+.heroAsideCard ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--la-ink-soft);
+  font-size: 0.9rem;
+}
+
+.heroAsideCard li {
+  padding: 0.3rem 0;
+  border-top: 1px dashed var(--ifm-color-emphasis-200);
+}
+
+/* ===== modules ===== */
+.modules {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionKicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--la-accent);
+}
+
+.sectionTitle {
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 14px;
+  padding: 1.5rem 1.6rem;
+  color: inherit;
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--la-accent);
+  box-shadow: 0 16px 32px rgba(20, 35, 29, 0.1);
+  text-decoration: none;
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+}
+
+.cardNo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--la-accent);
+}
+
+.cardEn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--ifm-color-emphasis-500);
+}
+
+.cardTitle {
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem;
+}
+
+.cardDesc {
+  flex: 1;
+  color: var(--la-ink-soft);
+  font-size: 0.95rem;
+  margin: 0 0 1rem;
+}
+
+.cardBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tags {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.tag {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--la-paper-2);
+  color: var(--la-ink-soft);
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.cardCta {
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.card:hover .cardCta {
+  color: var(--la-accent);
+}
+
+.pageNote {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 1.5rem 1rem 3rem;
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.9rem;
+}
+
+/* ===== responsive ===== */
+@media (max-width: 996px) {
+  .heroInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .heroAside {
+    justify-content: flex-start;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 3.5rem 1.25rem 2.5rem;
+  }
+
+  .heroTitle {
+    font-size: 2.2rem;
+  }
+
+  .heroSub {
+    font-size: 1rem;
+  }
+
+  .modules {
+    padding: 1rem 1.25rem 3rem;
+  }
+
+  .heroAsideCard {
+    transform: none;
+  }
+}

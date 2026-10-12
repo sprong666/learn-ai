@@ -1,7 +1,7 @@
 ---
 title: 导读
 description: AI 指导系统教程总览
-slug: /
+slug: intro
 sidebar_position: 1
 ---
 
@@ -11,10 +11,10 @@ sidebar_position: 1
 
 | 模块 | 内容 |
 | --- | --- |
-| [AI 概览](/category/overview) | 常见概念、提示词工程、Agent 基础（非系列文章） |
-| [OpenCode 系列](/category/opencode) | 入门教程、内置 Agent、SKILL 机制、内置 API |
-| [SKILL 系列](/category/skills) | 优秀 SKILL 的积累与实战记录 |
-| [DeepSeek Harness 系列](/category/deepseek-harness) | Harness 架构与实践 |
+| [AI 概览](overview) | 常见概念、提示词工程、Agent 基础（非系列文章） |
+| [OpenCode 系列](opencode) | 入门教程、内置 Agent、SKILL 机制、内置 API |
+| [SKILL 系列](skills) | 优秀 SKILL 的积累与实战记录 |
+| [DeepSeek Harness 系列](deepseek-harness) | Harness 架构与实践 |
 
 各模块内容持续更新中。
 
