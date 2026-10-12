@@ -23,7 +23,6 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           routeBasePath: '/',
-          showLastUpdateTime: true,
           editUrl: 'https://github.com/sprong666/learn-ai/tree/main/',
         },
         blog: false,
@@ -34,13 +33,25 @@ const config: Config = {
     ],
   ],
 
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'articles',
+        path: 'articles',
+        routeBasePath: 'articles',
+        sidebarPath: './sidebarsArticles.ts',
+        editUrl: 'https://github.com/sprong666/learn-ai/tree/main/',
+      },
+    ],
+  ],
+
   themeConfig: {
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
       title: '技术指南',
       logo: { alt: 'Logo', src: 'img/logo.svg' },
       items: [
-        { type: 'docSidebar', sidebarId: 'tutorialSidebar', label: '教程', position: 'left' },
         { href: 'https://github.com/sprong666/learn-ai', label: 'GitHub', position: 'right' },
       ],
     },

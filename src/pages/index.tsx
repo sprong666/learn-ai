@@ -71,9 +71,6 @@ export default function Home(): JSX.Element {
                 <Link to="/intro" className={`button button--primary button--lg ${styles.cta}`}>
                   开始阅读
                 </Link>
-                <Link to="/opencode/getting-started" className={`button button--lg ${styles.ctaGhost}`}>
-                  OpenCode 快速上手 →
-                </Link>
               </div>
             </div>
             <div className={`${styles.heroAside} ${styles.fadeUp}`} style={{ animationDelay: '320ms' }} aria-hidden="true">
@@ -119,7 +116,12 @@ export default function Home(): JSX.Element {
           </div>
         </section>
 
-        <footer className={styles.pageNote}>各模块内容持续更新中 · 欢迎 GitHub 提交反馈</footer>
+        <footer className={styles.pageNote}>
+          各模块内容持续更新中 · 欢迎 GitHub 提交反馈 ·{' '}
+          <Link to="/articles/bookmarks" className={styles.noteLink}>
+            收藏的文章
+          </Link>
+        </footer>
       </main>
     </Layout>
   );

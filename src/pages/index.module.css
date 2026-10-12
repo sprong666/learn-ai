@@ -301,6 +301,16 @@
   font-size: 0.9rem;
 }
 
+.noteLink {
+  color: var(--ifm-color-emphasis-600);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.noteLink:hover {
+  color: var(--la-accent);
+}
+
 /* ===== responsive ===== */
 @media (max-width: 996px) {
   .heroInner {
