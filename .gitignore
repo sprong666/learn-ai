@@ -5,3 +5,5 @@ build/
 npm-debug.log*
 .yarn/
 docusaurus-start.log
+
+.idea/

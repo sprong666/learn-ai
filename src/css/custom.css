@@ -167,6 +167,11 @@ html[data-theme='dark'] .theme-doc-sidebar-container {
   background: var(--la-paper-2);
 }
 
+/* ===== Heading anchor: hide the hover "#" ===== */
+.hash-link {
+  display: none;
+}
+
 /* pagination links */
 .pagination-nav__link {
   border: 1px solid var(--ifm-color-emphasis-200);
