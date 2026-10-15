@@ -86,17 +86,33 @@ h1, h2, h3, h4 {
 }
 
 .menu {
-  padding: 0.9rem 0.6rem !important;
+  padding: 0.9rem 0.6rem 2rem !important;
 }
 
+/* Level-1 category: section heading look */
+.menu__list > .menu__list-item > .menu__link--sublist,
+.menu__list > .menu__list-item > .menu__list-item-collapsible > .menu__link--sublist {
+  font-weight: 700;
+  font-size: 0.95em;
+  color: var(--ifm-font-color-base);
+  margin-top: 0.35rem;
+}
+
+/* Nested tree (2nd level and deeper): guide line + indent, like docsify */
 .menu__list .menu__list {
-  margin-left: 0.7rem;
-  padding-left: 0.55rem;
-  border-left: 1px solid var(--ifm-color-emphasis-200);
+  margin: 0.1rem 0 0.35rem 0.85rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--ifm-color-emphasis-200);
+  transition: border-color 0.2s ease;
+}
+
+/* Highlight the guide line while a branch is active/open */
+.menu__list .menu__list:has(.menu__link--active) {
+  border-left-color: var(--la-accent);
 }
 
 .menu__link {
-  padding: 0.35rem 0.6rem !important;
+  padding: 0.32rem 0.6rem !important;
   border-radius: 6px;
   line-height: 1.45;
   color: var(--la-ink-soft);
@@ -108,27 +124,54 @@ h1, h2, h3, h4 {
   color: var(--ifm-color-primary-dark);
 }
 
+/* Caret: subtle, aligned with the row, rotates when open */
+.menu__caret {
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+}
+
+.menu__caret::before {
+  transform: scale(0.72);
+  transform-origin: center;
+}
+
+.menu__list-item:hover > .menu__list-item-collapsible > .menu__caret,
+.menu__list-item:hover > .menu__caret {
+  opacity: 0.9;
+}
+
 .menu__link--sublist {
   font-weight: 600;
   color: var(--ifm-font-color-base);
 }
 
+/* Active leaf link: accent pill with guide-friendly radius */
 .menu__link--active:not(.menu__link--sublist) {
   background: var(--la-accent-soft);
   color: var(--la-accent) !important;
   font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--la-accent);
-  border-radius: 0 6px 6px 0;
+  border-radius: 6px;
 }
 
-.menu__link--sublist.menu__link--active {
+/* Active/open category title: green, no pill */
+.menu__link--sublist.menu__link--active,
+.menu__list-item--expanded > .menu__list-item-collapsible > .menu__link--sublist {
   background: transparent;
   color: var(--ifm-color-primary-dark) !important;
-  box-shadow: none;
 }
 
 html[data-theme='dark'] .theme-doc-sidebar-container {
   border-right-color: var(--ifm-color-emphasis-800) !important;
+}
+
+html[data-theme='dark'] .menu__list .menu__list {
+  border-left-color: var(--ifm-color-emphasis-700);
+}
+
+html[data-theme='dark'] .menu__list .menu__list:has(.menu__link--active) {
+  border-left-color: var(--la-accent);
 }
 
 /* ===== Right TOC ===== */
@@ -209,4 +252,35 @@ html[data-theme='dark'] .theme-doc-sidebar-container {
   border-color: var(--la-accent);
   color: var(--la-accent);
   background: transparent;
+}
+
+/* ===== Collapsible blocks (details/summary) ===== */
+details {
+  background: var(--la-paper-2);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-left: 3px solid var(--la-accent);
+  border-radius: 8px;
+  padding: 0 1rem;
+  margin: 1rem 0;
+}
+
+details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--la-ink);
+  padding: 0.75rem 0;
+}
+
+details > summary:hover {
+  color: var(--la-accent);
+}
+
+details[open] > summary {
+  border-bottom: 1px dashed var(--ifm-color-emphasis-300);
+  margin-bottom: 0.5rem;
+}
+
+html[data-theme='dark'] details {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--ifm-color-emphasis-300);
 }

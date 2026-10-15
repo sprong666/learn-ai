@@ -10,4 +10,8 @@ sidebar_position: 1
 
 - [文档写作 SKILL](01-doc-writing.md)
 - [代码审查 SKILL](02-code-review.md)
+- [i-have-adhd SKILL](04-i-have-adhd.md)
+- [diagram-design SKILL](05-diagram-design.md)
+- [answer-me-with-html SKILL](06-answer-me-with-html.md)
+- [mattpocock/skills 分析](07-mattpocock-skills.md)
 - [SKILL 模板](03-template.md)

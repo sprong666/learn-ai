@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokenViz</title>
+    <script type="module" src="transformers.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .tokenizer-selection {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .selection-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.2em;
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .checkbox-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        
+        .checkbox-label {
+            font-weight: 500;
+            cursor: pointer;
+            color: #333;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .tokenizer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .tokenizer-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+            display: none;
+        }
+        
+        .tokenizer-card.active {
+            display: block;
+        }
+        
+        .tokenizer-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .tokenizer-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .gpt2-title { background: linear-gradient(45deg, #ff6b6b, #ffa500); }
+        .bert-title { background: linear-gradient(45deg, #4ecdc4, #44a08d); }
+        .t5-title { background: linear-gradient(45deg, #a8edea, #fed6e3); color: #333; }
+        .llama-title { background: linear-gradient(45deg, #ff9a9e, #fecfef); color: #333; }
+        .qwen-title { background: linear-gradient(45deg, #fa709a, #fee140); color: #333; }
+        .deepseek-title { background: linear-gradient(45deg, #667eea, #764ba2); }
+        .roberta-title { background: linear-gradient(45deg, #00b894, #00cec9); }
+        .distilbert-title { background: linear-gradient(45deg, #e17055, #fdcb6e); }
+        .albert-title { background: linear-gradient(45deg, #74b9ff, #0984e3); }
+        .electra-title { background: linear-gradient(45deg, #a29bfe, #6c5ce7); }
+        .deberta-title { background: linear-gradient(45deg, #fd79a8, #e91e63); }
+        .gptneo-title { background: linear-gradient(45deg, #00cec9, #55efc4); color: #333; }
+        .gptj-title { background: linear-gradient(45deg, #ff7675, #d63031); }
+        .falcon-title { background: linear-gradient(45deg, #fdcb6e, #f39c12); color: #333; }
+        .mistral-title { background: linear-gradient(45deg, #636e72, #b2bec3); }
+        .phi-title { background: linear-gradient(45deg, #0984e3, #74b9ff); }
+        .gemma-title { background: linear-gradient(45deg, #ff9ff3, #f368e0); color: #333; }
+        .bloom-title { background: linear-gradient(45deg, #f0f, #8e44ad); }
+        
+        .token-output {
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            padding: 15px;
+            background: #fafafa;
+            line-height: 1.8;
+            word-wrap: break-word;
+        }
+        
+        .token {
+            display: inline-block;
+            margin: 2px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .token:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        .token-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 100;
+        }
+        
+        .token:hover .token-tooltip {
+            opacity: 1;
+        }
+        
+        .token-count {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+            color: #666;
+        }
+        
+        .stats {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .placeholder {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        .error {
+            color: #e74c3c;
+            background: #ffeaea;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #e74c3c;
+            font-size: 0.9em;
+        }
+        
+        .model-status {
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .model-loaded {
+            color: #27ae60;
+        }
+        
+        .model-loading {
+            color: #f39c12;
+        }
+        
+        .model-error {
+            color: #e74c3c;
+        }
+        
+        .no-tokenizers-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 30px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Tokenizer Visualization</h1>
+        <p class="subtitle">Powered by Hugging Face Transformers.js - Real tokenizers from popular models</p>
+        <p class="subtitle">Learn how the Artificial Intelligence sees the <s>world</s> your text</p>        
+        <div class="tokenizer-selection">
+            <div class="selection-title">Select Tokenizers to Load:</div>
+            <div class="checkbox-grid">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="gpt2-checkbox" checked>
+                    <label for="gpt2-checkbox" class="checkbox-label">GPT-2</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="bert-checkbox" checked>
+                    <label for="bert-checkbox" class="checkbox-label">BERT</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="t5-checkbox">
+                    <label for="t5-checkbox" class="checkbox-label">T5</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="llama-checkbox">
+                    <label for="llama-checkbox" class="checkbox-label">Llama</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="qwen-checkbox">
+                    <label for="qwen-checkbox" class="checkbox-label">Qwen2</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="deepseek-checkbox">
+                    <label for="deepseek-checkbox" class="checkbox-label">DeepSeek</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="roberta-checkbox">
+                    <label for="roberta-checkbox" class="checkbox-label">RoBERTa</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="distilbert-checkbox">
+                    <label for="distilbert-checkbox" class="checkbox-label">DistilBERT</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="albert-checkbox">
+                    <label for="albert-checkbox" class="checkbox-label">ALBERT</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="electra-checkbox">
+                    <label for="electra-checkbox" class="checkbox-label">ELECTRA</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="deberta-checkbox">
+                    <label for="deberta-checkbox" class="checkbox-label">DeBERTa</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="gptneo-checkbox">
+                    <label for="gptneo-checkbox" class="checkbox-label">GPT-Neo</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="gptj-checkbox">
+                    <label for="gptj-checkbox" class="checkbox-label">GPT-J</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="falcon-checkbox">
+                    <label for="falcon-checkbox" class="checkbox-label">Falcon</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="mistral-checkbox">
+                    <label for="mistral-checkbox" class="checkbox-label">Mistral</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="phi-checkbox">
+                    <label for="phi-checkbox" class="checkbox-label">Phi</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="gemma-checkbox">
+                    <label for="gemma-checkbox" class="checkbox-label">Gemma</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="bloom-checkbox">
+                    <label for="bloom-checkbox" class="checkbox-label">BLOOM</label>
+                </div>
+            </div>
+            <div style="margin-top: 15px; font-size: 0.9em; color: #666; text-align: center;">
+                Select tokenizers and they will load automatically. First-time loading may take a moment. This entirely runs locally on your device.
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <label for="textInput" class="input-label">Enter text to tokenize:</label>
+            <textarea 
+                id="textInput" 
+                class="text-input" 
+                rows="4" 
+                placeholder="Type your text here and watch how different real tokenizers break it down..."
+            >Hello, world! How are you doing today? This is a sample text to demonstrate real tokenization with transformers.js library.</textarea>
+        </div>
+        
+        <div id="tokenizerGrid" class="tokenizer-grid">
+            <div id="gpt2-card" class="tokenizer-card">
+                <div class="tokenizer-title gpt2-title">GPT-2 Tokenizer</div>
+                <div class="model-status" id="gpt2Status">Ready to load...</div>
+                <div id="gpt2Output" class="token-output">
+                    <div class="placeholder">Select GPT-2 above to load tokenizer</div>
+                </div>
+                <div id="gpt2Count" class="token-count"></div>
+            </div>
+            
+            <div id="bert-card" class="tokenizer-card">
+                <div class="tokenizer-title bert-title">BERT Tokenizer</div>
+                <div class="model-status" id="bertStatus">Ready to load...</div>
+                <div id="bertOutput" class="token-output">
+                    <div class="placeholder">Select BERT above to load tokenizer</div>
+                </div>
+                <div id="bertCount" class="token-count"></div>
+            </div>
+            
+            <div id="t5-card" class="tokenizer-card">
+                <div class="tokenizer-title t5-title">T5 Tokenizer</div>
+                <div class="model-status" id="t5Status">Ready to load...</div>
+                <div id="t5Output" class="token-output">
+                    <div class="placeholder">Select T5 above to load tokenizer</div>
+                </div>
+                <div id="t5Count" class="token-count"></div>
+            </div>
+            
+            <div id="llama-card" class="tokenizer-card">
+                <div class="tokenizer-title llama-title">Llama Tokenizer</div>
+                <div class="model-status" id="llamaStatus">Ready to load...</div>
+                <div id="llamaOutput" class="token-output">
+                    <div class="placeholder">Select Llama above to load tokenizer</div>
+                </div>
+                <div id="llamaCount" class="token-count"></div>
+            </div>
+            
+            <div id="qwen-card" class="tokenizer-card">
+                <div class="tokenizer-title qwen-title">Qwen2 Tokenizer</div>
+                <div class="model-status" id="qwenStatus">Ready to load...</div>
+                <div id="qwenOutput" class="token-output">
+                    <div class="placeholder">Select Qwen2 above to load tokenizer</div>
+                </div>
+                <div id="qwenCount" class="token-count"></div>
+            </div>
+            
+            <div id="deepseek-card" class="tokenizer-card">
+                <div class="tokenizer-title deepseek-title">DeepSeek Tokenizer</div>
+                <div class="model-status" id="deepseekStatus">Ready to load...</div>
+                <div id="deepseekOutput" class="token-output">
+                    <div class="placeholder">Select DeepSeek above to load tokenizer</div>
+                </div>
+                <div id="deepseekCount" class="token-count"></div>
+            </div>
+            
+            <div id="roberta-card" class="tokenizer-card">
+                <div class="tokenizer-title roberta-title">RoBERTa Tokenizer</div>
+                <div class="model-status" id="robertaStatus">Ready to load...</div>
+                <div id="robertaOutput" class="token-output">
+                    <div class="placeholder">Select RoBERTa above to load tokenizer</div>
+                </div>
+                <div id="robertaCount" class="token-count"></div>
+            </div>
+            
+            <div id="distilbert-card" class="tokenizer-card">
+                <div class="tokenizer-title distilbert-title">DistilBERT Tokenizer</div>
+                <div class="model-status" id="distilbertStatus">Ready to load...</div>
+                <div id="distilbertOutput" class="token-output">
+                    <div class="placeholder">Select DistilBERT above to load tokenizer</div>
+                </div>
+                <div id="distilbertCount" class="token-count"></div>
+            </div>
+            
+            <div id="albert-card" class="tokenizer-card">
+                <div class="tokenizer-title albert-title">ALBERT Tokenizer</div>
+                <div class="model-status" id="albertStatus">Ready to load...</div>
+                <div id="albertOutput" class="token-output">
+                    <div class="placeholder">Select ALBERT above to load tokenizer</div>
+                </div>
+                <div id="albertCount" class="token-count"></div>
+            </div>
+            
+            <div id="electra-card" class="tokenizer-card">
+                <div class="tokenizer-title electra-title">ELECTRA Tokenizer</div>
+                <div class="model-status" id="electraStatus">Ready to load...</div>
+                <div id="electraOutput" class="token-output">
+                    <div class="placeholder">Select ELECTRA above to load tokenizer</div>
+                </div>
+                <div id="electraCount" class="token-count"></div>
+            </div>
+            
+            <div id="deberta-card" class="tokenizer-card">
+                <div class="tokenizer-title deberta-title">DeBERTa Tokenizer</div>
+                <div class="model-status" id="debertaStatus">Ready to load...</div>
+                <div id="debertaOutput" class="token-output">
+                    <div class="placeholder">Select DeBERTa above to load tokenizer</div>
+                </div>
+                <div id="debertaCount" class="token-count"></div>
+            </div>
+            
+            <div id="gptneo-card" class="tokenizer-card">
+                <div class="tokenizer-title gptneo-title">GPT-Neo Tokenizer</div>
+                <div class="model-status" id="gptneoStatus">Ready to load...</div>
+                <div id="gptneoOutput" class="token-output">
+                    <div class="placeholder">Select GPT-Neo above to load tokenizer</div>
+                </div>
+                <div id="gptneoCount" class="token-count"></div>
+            </div>
+            
+            <div id="gptj-card" class="tokenizer-card">
+                <div class="tokenizer-title gptj-title">GPT-J Tokenizer</div>
+                <div class="model-status" id="gptjStatus">Ready to load...</div>
+                <div id="gptjOutput" class="token-output">
+                    <div class="placeholder">Select GPT-J above to load tokenizer</div>
+                </div>
+                <div id="gptjCount" class="token-count"></div>
+            </div>
+            
+            <div id="falcon-card" class="tokenizer-card">
+                <div class="tokenizer-title falcon-title">Falcon Tokenizer</div>
+                <div class="model-status" id="falconStatus">Ready to load...</div>
+                <div id="falconOutput" class="token-output">
+                    <div class="placeholder">Select Falcon above to load tokenizer</div>
+                </div>
+                <div id="falconCount" class="token-count"></div>
+            </div>
+            
+            <div id="mistral-card" class="tokenizer-card">
+                <div class="tokenizer-title mistral-title">Mistral Tokenizer</div>
+                <div class="model-status" id="mistralStatus">Ready to load...</div>
+                <div id="mistralOutput" class="token-output">
+                    <div class="placeholder">Select Mistral above to load tokenizer</div>
+                </div>
+                <div id="mistralCount" class="token-count"></div>
+            </div>
+            
+            <div id="phi-card" class="tokenizer-card">
+                <div class="tokenizer-title phi-title">Phi Tokenizer</div>
+                <div class="model-status" id="phiStatus">Ready to load...</div>
+                <div id="phiOutput" class="token-output">
+                    <div class="placeholder">Select Phi above to load tokenizer</div>
+                </div>
+                <div id="phiCount" class="token-count"></div>
+            </div>
+            
+            <div id="gemma-card" class="tokenizer-card">
+                <div class="tokenizer-title gemma-title">Gemma Tokenizer</div>
+                <div class="model-status" id="gemmaStatus">Ready to load...</div>
+                <div id="gemmaOutput" class="token-output">
+                    <div class="placeholder">Select Gemma above to load tokenizer</div>
+                </div>
+                <div id="gemmaCount" class="token-count"></div>
+            </div>
+            
+            <div id="bloom-card" class="tokenizer-card">
+                <div class="tokenizer-title bloom-title">BLOOM Tokenizer</div>
+                <div class="model-status" id="bloomStatus">Ready to load...</div>
+                <div id="bloomOutput" class="token-output">
+                    <div class="placeholder">Select BLOOM above to load tokenizer</div>
+                </div>
+                <div id="bloomCount" class="token-count"></div>
+            </div>
+        </div>
+        
+        <div id="noTokenizersMessage" class="no-tokenizers-message" style="display: none;">
+            <h3>No Tokenizers Selected</h3>
+            <p>Please select at least one tokenizer from the checkboxes above to see tokenization results.</p>
+        </div>
+        
+        <div class="stats">
+            <h3>Tokenization Comparison</h3>
+            <div id="statsContent">Select tokenizers above to see comparison</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { AutoTokenizer } from './transformers.min.js';
+        
+        // Model configurations
+        const modelConfigs = {
+            gpt2: { name: 'gpt2', displayName: 'GPT-2' },
+            bert: { name: 'bert-base-uncased', displayName: 'BERT' },
+            t5: { name: 't5-small', displayName: 'T5' },
+            llama: { name: 'huggyllama/llama-7b', displayName: 'Llama' },
+            qwen: { name: 'Qwen/Qwen2-0.5B', displayName: 'Qwen2' },
+            deepseek: { name: 'deepseek-ai/deepseek-coder-1.3b-base', displayName: 'DeepSeek' },
+            roberta: { name: 'roberta-base', displayName: 'RoBERTa' },
+            distilbert: { name: 'distilbert-base-uncased', displayName: 'DistilBERT' },
+            albert: { name: 'albert-base-v2', displayName: 'ALBERT' },
+            electra: { name: 'google/electra-base-discriminator', displayName: 'ELECTRA' },
+            deberta: { name: 'microsoft/deberta-v3-base', displayName: 'DeBERTa' },
+            gptneo: { name: 'EleutherAI/gpt-neo-125M', displayName: 'GPT-Neo' },
+            gptj: { name: 'EleutherAI/gpt-j-6b', displayName: 'GPT-J' },
+            falcon: { name: 'tiiuae/falcon-rw-1b', displayName: 'Falcon' },
+            mistral: { name: 'mistralai/Mistral-7B-v0.1', displayName: 'Mistral' },
+            phi: { name: 'microsoft/phi-2', displayName: 'Phi' },
+            gemma: { name: 'google/gemma-2b', displayName: 'Gemma' },
+            bloom: { name: 'bigscience/bloom-560m', displayName: 'BLOOM' }
+        };
+        
+        // Color palettes for different tokenizers
+        const colorPalettes = {
+            gpt2: [
+                '#ff6b6b', '#ffa500', '#ffeb3b', '#4caf50', '#2196f3',
+                '#9c27b0', '#e91e63', '#ff5722', '#795548', '#607d8b',
+                '#ff9800', '#8bc34a', '#00bcd4', '#673ab7', '#f44336'
+            ],
+            bert: [
+                '#4ecdc4', '#44a08d', '#96ceb4', '#ffeaa7', '#fab1a0',
+                '#fd79a8', '#a29bfe', '#6c5ce7', '#00cec9', '#55a3ff',
+                '#fdcb6e', '#e17055', '#74b9ff', '#0984e3', '#00b894'
+            ],
+            t5: [
+                '#a8edea', '#fed6e3', '#d299c2', '#fef9d7', '#dae2f8',
+                '#d6a4a4', '#ffaaa5', '#ff8a95', '#ffc3a0', '#c7ecee',
+                '#ff7675', '#74b9ff', '#00cec9', '#fdcb6e', '#6c5ce7'
+            ],
+            llama: [
+                '#ff9a9e', '#fecfef', '#ffc3a0', '#f093fb', '#f5576c',
+                '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#ffecd2'
+            ],
+            qwen: [
+                '#fa709a', '#fee140', '#a8edea', '#fed6e3', '#ffd89b',
+                '#19547b', '#ffd89b', '#19547b', '#667eea', '#764ba2'
+            ],
+            deepseek: [
+                '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe',
+                '#00f2fe', '#43e97b', '#38f9d7', '#ffecd2', '#feb692'
+            ],
+            roberta: [
+                '#00b894', '#00cec9', '#55efc4', '#81ecec', '#a29bfe',
+                '#dfe6e9', '#b2bec3', '#636e72', '#fdcb6e', '#f39c12'
+            ],
+            distilbert: [
+                '#e17055', '#fdcb6e', '#fab1a0', '#ffeaa7', '#ff7675',
+                '#fd79a8', '#e84393', '#d63031', '#e74c3c', '#c0392b'
+            ],
+            albert: [
+                '#74b9ff', '#0984e3', '#00cec9', '#0abde3', '#48dbfb',
+                '#1dd1a1', '#10ac84', '#008945', '#25c281', '#3cba91'
+            ],
+            electra: [
+                '#a29bfe', '#6c5ce7', '#5f27cd', '#341f97', '#8e44ad',
+                '#9b59b6', '#8c7ae0', '#a55eea', '#c56cf0', '#7d5fff'
+            ],
+            deberta: [
+                '#fd79a8', '#e91e63', '#d63384', '#c44569', '#f8b500',
+                '#ff6348', '#ee5a24', '#e55039', '#eb4d4b', '#e74c3c'
+            ],
+            gptneo: [
+                '#00cec9', '#55efc4', '#81ecec', '#a3cb38', '#009432',
+                '#065c00', '#10ac84', '#1dd1a1', '#0abde3', '#48dbfb'
+            ],
+            gptj: [
+                '#ff7675', '#d63031', '#c0392b', '#a93226', '#e74c3c',
+                '#eb4d4b', '#e55039', '#ff6b6b', '#c0392b', '#922b21'
+            ],
+            falcon: [
+                '#fdcb6e', '#f39c12', '#e67e22', '#d35400', '#f39c12',
+                '#f1c40f', '#d4ac0d', '#b7950b', '#9a7d0a', '#7d6608'
+            ],
+            mistral: [
+                '#636e72', '#b2bec3', '#dfe6e9', '#b2bec3', '#95afc0',
+                '#a3cb38', '#009432', '#065c00', '#10ac84', '#1dd1a1'
+            ],
+            phi: [
+                '#0984e3', '#74b9ff', '#00cec9', '#0abde3', '#48dbfb',
+                '#00b894', '#00cec9', '#55efc4', '#81ecec', '#a29bfe'
+            ],
+            gemma: [
+                '#ff9ff3', '#f368e0', '#f8b500', '#ee5a24', '#ff6348',
+                '#ff6b6b', '#ffa502', '#ff4757', '#2f3542', '#57606f'
+            ],
+            bloom: [
+                '#a55eea', '#8e44ad', '#9b59b6', '#8c7ae0', '#a55eea',
+                '#c56cf0', '#7d5fff', '#5352ed', '#3742fa', '#2c3e50'
+            ]
+        };
+
+        let tokenizers = {};
+        let loadingStates = {};
+
+        function updateModelStatus(modelKey, status, isError = false) {
+            const statusElement = document.getElementById(`${modelKey}Status`);
+            if (statusElement) {
+                statusElement.textContent = status;
+                statusElement.className = `model-status ${isError ? 'model-error' : (status.includes('✓') ? 'model-loaded' : 'model-loading')}`;
+            }
+        }
+
+        function toggleTokenizerCard(modelKey, show) {
+            const card = document.getElementById(`${modelKey}-card`);
+            if (card) {
+                if (show) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            }
+            updateNoTokenizersMessage();
+        }
+
+        function updateNoTokenizersMessage() {
+            const activeCards = document.querySelectorAll('.tokenizer-card.active');
+            const message = document.getElementById('noTokenizersMessage');
+            if (activeCards.length === 0) {
+                message.style.display = 'block';
+            } else {
+                message.style.display = 'none';
+            }
+        }
+
+        async function loadTokenizer(modelKey) {
+            if (loadingStates[modelKey] || tokenizers[modelKey]) {
+                return;
+            }
+
+            loadingStates[modelKey] = true;
+            const config = modelConfigs[modelKey];
+            updateModelStatus(modelKey, `Loading ${config.displayName}...`);
+            
+            try {
+                tokenizers[modelKey] = await AutoTokenizer.from_pretrained(config.name);
+                updateModelStatus(modelKey, `✓ ${config.displayName} Ready`);
+                
+                // Process text if there's already text in the input
+                const text = document.getElementById('textInput').value.trim();
+                if (text) {
+                    processTokenizer(modelKey, text);
+                }
+            } catch (error) {
+                console.error(`${config.displayName} tokenizer failed:`, error);
+                updateModelStatus(modelKey, `✗ ${config.displayName} Failed`, true);
+                
+                // Show error in output
+                const output = document.getElementById(`${modelKey}Output`);
+                if (output) {
+                    output.innerHTML = `<div class="error">Failed to load ${config.displayName} tokenizer: ${error.message}</div>`;
+                }
+            }
+            
+            loadingStates[modelKey] = false;
+        }
+
+        function unloadTokenizer(modelKey) {
+            delete tokenizers[modelKey];
+            delete loadingStates[modelKey];
+            updateModelStatus(modelKey, 'Ready to load...');
+            
+            // Reset output
+            const output = document.getElementById(`${modelKey}Output`);
+            const count = document.getElementById(`${modelKey}Count`);
+            if (output) {
+                output.innerHTML = `<div class="placeholder">Select ${modelConfigs[modelKey].displayName} above to load tokenizer</div>`;
+            }
+            if (count) {
+                count.textContent = '';
+            }
+        }
+
+        function getTokenColor(index, palette) {
+            return palette[index % palette.length];
+        }
+
+        function getContrastColor(hexColor) {
+            const r = parseInt(hexColor.slice(1, 3), 16);
+            const g = parseInt(hexColor.slice(3, 5), 16);
+            const b = parseInt(hexColor.slice(5, 7), 16);
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            return luminance > 0.5 ? '#000000' : '#ffffff';
+        }
+
+        function renderTokens(tokens, tokenIds, outputId, palette, countId, tokenizerName) {
+            const output = document.getElementById(outputId);
+            const count = document.getElementById(countId);
+            
+            if (!tokens || tokens.length === 0) {
+                output.innerHTML = '<div class="placeholder">No tokens generated</div>';
+                count.textContent = '';
+                return;
+            }
+
+            const tokenElements = tokens.map((token, index) => {
+                const color = getContrastColor(getTokenColor(index, palette));
+                const bgColor = getTokenColor(index, palette);
+                const tokenId = tokenIds ? tokenIds[index] : 'N/A';
+                const displayToken = token.replace(/Ġ/g, '▁').replace(/▁/g, '·').replace(/\n/g, '\\n'); // Handle special tokens
+                
+                return `<span class="token" style="background-color: ${bgColor}; color: ${color}" title="Token ${index + 1}">
+                    ${escapeHtml(displayToken)}
+                    <div class="token-tooltip">ID: ${tokenId}<br>Index: ${index}<br>Raw: "${escapeHtml(token)}"</div>
+                </span>`;
+            }).join('');
+
+            output.innerHTML = tokenElements;
+            count.textContent = `Tokens: ${tokens.length}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function processTokenizer(modelKey, text) {
+            const tokenizer = tokenizers[modelKey];
+            if (!tokenizer) return;
+
+            const outputId = `${modelKey}Output`;
+            const countId = `${modelKey}Count`;
+            
+            document.getElementById(outputId).innerHTML = '<div class="loading">Tokenizing...</div>';
+            
+            try {
+                const encoded = await tokenizer.encode(text);
+                const tokens = encoded.map(id => tokenizer.decode([id], { skip_special_tokens: false }));
+                const palette = colorPalettes[modelKey];
+                
+                renderTokens(tokens, encoded, outputId, palette, countId, modelKey);
+                return tokens;
+            } catch (error) {
+                console.error(`Error tokenizing with ${modelKey}:`, error);
+                document.getElementById(outputId).innerHTML = `<div class="error">Error tokenizing: ${error.message}</div>`;
+                return [];
+            }
+        }
+
+        async function processAllTokenizers() {
+            const text = document.getElementById('textInput').value.trim();
+            
+            if (!text) {
+                // Clear all outputs
+                Object.keys(tokenizers).forEach(modelKey => {
+                    const output = document.getElementById(`${modelKey}Output`);
+                    const count = document.getElementById(`${modelKey}Count`);
+                    if (output) {
+                        output.innerHTML = `<div class="placeholder">Enter text above to see ${modelConfigs[modelKey].displayName} tokenization</div>`;
+                    }
+                    if (count) {
+                        count.textContent = '';
+                    }
+                });
+                updateStats({});
+                return;
+            }
+
+            const results = {};
+            
+            // Process each loaded tokenizer
+            for (const modelKey of Object.keys(tokenizers)) {
+                results[modelKey] = await processTokenizer(modelKey, text);
+            }
+
+            updateStats(results);
+        }
+
+        function updateStats(results) {
+            const statsContent = document.getElementById('statsContent');
+            
+            const counts = Object.entries(results)
+                .filter(([_, tokens]) => tokens && tokens.length > 0)
+                .map(([modelKey, tokens]) => ({
+                    name: modelConfigs[modelKey].displayName,
+                    count: tokens.length,
+                    key: modelKey
+                }));
+
+            if (counts.length === 0) {
+                statsContent.innerHTML = 'Select tokenizers and enter text to see comparison';
+                return;
+            }
+
+            const minCount = Math.min(...counts.map(t => t.count));
+            const maxCount = Math.max(...counts.map(t => t.count));
+            const mostEfficient = counts.find(t => t.count === minCount);
+            const leastEfficient = counts.find(t => t.count === maxCount);
+
+            const stats = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 15px 0;">
+                    ${counts.map(t => `<div><strong>${t.name}:</strong> ${t.count} tokens</div>`).join('')}
+                </div>
+                <div style="margin-top: 15px;">
+                    <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                        Different tokenizers use different subword strategies, affecting token count and model efficiency.
+                    </div>
+                </div>
+            `;
+            
+            statsContent.innerHTML = stats;
+        }
+
+        // Event listeners for checkboxes
+        Object.keys(modelConfigs).forEach(modelKey => {
+            const checkbox = document.getElementById(`${modelKey}-checkbox`);
+            if (checkbox) {
+                checkbox.addEventListener('change', async (e) => {
+                    const isChecked = e.target.checked;
+                    toggleTokenizerCard(modelKey, isChecked);
+                    
+                    if (isChecked) {
+                        await loadTokenizer(modelKey);
+                    } else {
+                        unloadTokenizer(modelKey);
+                    }
+                    
+                    // Reprocess text with current tokenizers
+                    await processAllTokenizers();
+                });
+            }
+        });
+
+        // Text input event listener
+        document.getElementById('textInput').addEventListener('input', processAllTokenizers);
+
+        // Initialize with checked tokenizers
+        document.addEventListener('DOMContentLoaded', async () => {
+            const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            for (const checkbox of checkedBoxes) {
+                const modelKey = checkbox.id.replace('-checkbox', '');
+                toggleTokenizerCard(modelKey, true);
+                await loadTokenizer(modelKey);
+            }
+            
+            // Process initial text
+            await processAllTokenizers();
+        });
+    </script>
+</body>
+</html>

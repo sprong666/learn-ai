@@ -1,7 +1,7 @@
 ---
 title: Harness Engineering
 description: 从 Prompt Engineering、Context Engineering 到 Harness Engineering：让模型稳定交付的运行控制系统
-sidebar_position: 5
+sidebar_position: 4
 ---
 
 # 一文带你弄懂 AI 圈爆火的新概念：Harness Engineering
